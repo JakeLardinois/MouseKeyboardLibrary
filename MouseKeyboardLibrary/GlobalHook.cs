@@ -51,6 +51,9 @@ namespace MouseKeyboardLibrary
             public int dwExtraInfo;
         }
 
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
         [DllImport("user32.dll", CharSet = CharSet.Auto,
            CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         protected static extern int SetWindowsHookEx(
@@ -169,10 +172,11 @@ namespace MouseKeyboardLibrary
                 // If not, GC randomly collects it, and a NullReference exception is thrown
                 _hookCallback = new HookProc(HookCallbackProcedure);
 
+                IntPtr mar = LoadLibrary("user32.dll");
                 _handleToHook = SetWindowsHookEx(
                     _hookType,
                     _hookCallback,
-                    Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]),
+                    mar,
                     0);
 
                 // Were we able to sucessfully start hook?
